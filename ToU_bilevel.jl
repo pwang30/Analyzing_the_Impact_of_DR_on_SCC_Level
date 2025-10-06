@@ -119,4 +119,106 @@ BilevelJuMP. set_mode(model , BilevelJuMP. StrongDualityMode())
 # set_optimizer(model , SCIP.Optimizer)
 # set_attribute(model, "limits/gap", 0.0280)
 # set_time_limit_sec(model, 700.0)
+
 optimize!(model)
+
+
+
+
+# ==============================================
+# 24-hour TOU Load-Price Elasticity Matrix Model
+# Author: (Your Name)
+# ==============================================
+
+using LinearAlgebra
+
+# --- Define 24 Time Periods ---
+n_periods = 24
+
+# Define TOU period type for each hour: 1=valley, 2=flat, 3=peak
+tou_type = [
+    1,1,1,1,1,  # 0–5h: valley
+    2,2,2,      # 6–8h: flat
+    3,3,3,3,    # 9–12h: peak
+    2,2,2,2,    # 13–16h: flat
+    3,3,3,      # 17–19h: peak
+    2,2,2,      # 20–22h: flat
+    1           # 23h: valley
+]
+
+# --- Base Load (kWh) for each hour ---
+base_load = [
+    800, 750, 700, 680, 700,   # 0–5h valley
+    1000, 1200, 1400,          # 6–8h flat
+    2000, 2200, 2300, 2400,    # 9–12h peak
+    1800, 1600, 1500, 1400,    # 13–16h flat
+    2500, 2600, 2400,          # 17–19h peak
+    1700, 1500, 1300,          # 20–22h flat
+    900                        # 23h valley
+]
+
+# --- Base TOU Prices (¥/kWh) ---
+price_valley = 0.3
+price_flat   = 0.6
+price_peak   = 1.0
+
+base_price = [price_valley, price_flat, price_peak][tou_type]
+
+# --- Define Elasticity Parameters ---
+self_elasticity = -0.25       # own-price elasticity
+cross_elasticity_adj = 0.05   # adjacent-period elasticity
+cross_elasticity_nonadj = 0.02 # non-adjacent weak elasticity
+
+# --- Construct Elasticity Matrix (24x24) ---
+E = zeros(Float64, n_periods, n_periods)
+for i in 1:n_periods
+    for j in 1:n_periods
+        if i == j
+            E[i, j] = self_elasticity
+        elseif abs(i - j) == 1
+            E[i, j] = cross_elasticity_adj
+        else
+            E[i, j] = cross_elasticity_nonadj
+        end
+    end
+end
+
+# --- Define New TOU Prices (¥/kWh) ---
+# Example: slightly increase peak prices, reduce valley prices
+new_price = copy(base_price)
+for i in 1:n_periods
+    if tou_type[i] == 3      # peak
+        new_price[i] *= 1.10
+    elseif tou_type[i] == 1  # valley
+        new_price[i] *= 0.90
+    end
+end
+
+# --- Compute Load Change ---
+ΔP = (new_price .- base_price) ./ base_price
+ΔL = E * ΔP
+new_load = base_load .* (1 .+ ΔL)
+
+# --- Display Results ---
+println("=== TOU Elasticity Matrix Model ===")
+println("Total Base Load (kWh): ", sum(base_load))
+println("Total New Load (kWh): ", round(sum(new_load), digits=2))
+println("Total Load Change: ", round(sum(new_load) - sum(base_load), digits=2), " kWh\n")
+
+println("Hour | TOU | Base_Price | New_Price | Base_Load | New_Load | ΔLoad(%)")
+for i in 1:n_periods
+    println(rpad(i,4), " | ",
+            tou_type[i], "   | ",
+            round(base_price[i], digits=2), "       | ",
+            round(new_price[i], digits=2), "     | ",
+            round(base_load[i], digits=0), "      | ",
+            round(new_load[i], digits=0), "    | ",
+            round(ΔL[i]*100, digits=2))
+end
+
+# ==============================================
+# Notes:
+# - Negative self-elasticity: load drops when price rises.
+# - Positive cross-elasticity: load shifts between adjacent hours.
+# - You can modify elasticity parameters for sensitivity analysis.
+# ==============================================
