@@ -222,3 +222,72 @@ end
 # - Positive cross-elasticity: load shifts between adjacent hours.
 # - You can modify elasticity parameters for sensitivity analysis.
 # ==============================================
+
+
+
+%function fxx=DR(fx) %负荷响应
+%% 调这里的参数就行
+fx=p1';%负荷曲线 (单独初始负荷或者汽车   or 初始负荷+汽车)
+fj=1.18; %峰时段电价
+pj=0.72; %平时段电价
+gj=0.43; %谷时段电价
+DIANJIA=[gj,gj,gj,gj,pj,pj,pj,pj,pj,pj,fj,fj,fj,fj,pj,pj,pj,fj,fj,fj,fj,fj,gj,gj];% 各时刻电价 24h
+
+El=-0.3;%自弹性系数
+Efp=0.03;%峰-平弹性系数
+Efg=0.05;%峰-谷弹性系数
+Epg=0.03;%平-谷弹性系数
+
+%%
+kf=(fj-pj)/pj;
+kp=0;
+kg=(gj-pj)/pj;
+
+lam=zeros(24,24);
+for i=1:24
+    if DIANJIA(i)==fj
+        lam(i,i)=kf*El;
+    elseif DIANJIA(i)==pj
+        lam(i,i)=0;
+    elseif DIANJIA(i)==gj
+        lam(i,i)=kg*El;
+    end
+    for j=i+1:24
+        if DIANJIA(i)==fj && DIANJIA(j)==gj
+        lam(i,j)=kg*Efg;
+        elseif DIANJIA(i)==fj && DIANJIA(j)==pj
+            lam(i,j)=-(kf-kg)*Efp;
+        elseif DIANJIA(i)==pj && DIANJIA(j)==gj
+            lam(i,j)=kg*Efp;
+        elseif DIANJIA(i)==gj && DIANJIA(j)==fj
+        lam(i,j)=-kg*Efg;
+        elseif DIANJIA(i)==pj && DIANJIA(j)==gj
+            lam(i,j)=(kf-kg)*Efp;
+        elseif DIANJIA(i)==gj && DIANJIA(j)==pj
+            lam(i,j)=-kg*Efp;
+        end
+        lam(j,i)=-lam(i,j);
+    end
+end
+fxx=fx+lam*fx;
+figure;
+plot(fxx+p0','r-o')
+hold on
+plot(p0'+p1','b-*')
+legend('需求响应后','需求响应前');
+xlabel('时间');
+ylabel('功率');
+axis([1 24 0 3500]);
+hold on
+yyaxis right
+%x=[0.5  2.2 3.2 4.2 5.2 6.2 7.2 8.2 9.2 10.2 11.2 12.2 13.2 14.2 15.2 16.2 17.2 18.2 19.2 20.2 21.2 22.2 23.2 24.5];
+%x=linspace(0.5, 24, 24);
+% x=[0 1 2 3 4 5.5 7 8 9 10 11 12 13 14 15 16 16.5 18 19.4 20 21 21.5 23.2 25];
+x=[1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24];
+stairs(x,DIANJIA,'b-')
+xlabel('时间(h)','Fontname','宋体','Fontsize',7.5);
+ylabel('电价价格(元/kWh)','Fontname','宋体','Fontsize',7.5)
+axis([1 24 0 2]);
+set(gca,'position',[0.09 0.13 0.8 0.65]);
+set(gca,'box','off');
+
