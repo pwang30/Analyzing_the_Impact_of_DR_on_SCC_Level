@@ -261,8 +261,8 @@ end
 
 xs = energy_price_restricted
 
-kil = [150, 200, 400]        # Interrupted Load Compensation Fee
-cil = [0.1, 0.08, 0.05]      # Maximum Interrupted Load Ratio
+kil = [200, 300, 500]        # Interrupted Load Compensation Fee
+cil = [0.05, 0.03, 0.01]      # Maximum Interrupted Load Ratio
 
 @variable(model, 0 <= pil[1:3, 1:24])  # Interrupted Load
 @variable(model, 0 <= shiftl[1:24])    # Transferred-out Load
@@ -283,13 +283,13 @@ for m in 1:3, t in 1:24   # Hierarchical Interrupted Load Constraints
 end
 
 for m in 1:3, t in 2:24   # Continuous Interrupted Load Constraints
-    @constraint(model, pil[m,t] + pil[m,t-1] <= 0.2*pload[t])
+    @constraint(model, pil[m,t] + pil[m,t-1] <= 0.09*pload[t])
 end
 
 for t in 1:24               # Transferable Load Constraints
     @constraint(model, ushiftl[t] + ushiftq[t] <= 1)
-    @constraint(model, shiftl[t] <= ushiftl[t]*pload[t]*0.12)
-    @constraint(model, shiftq[t] <= ushiftq[t]*pload[t]*0.12)
+    @constraint(model, shiftl[t] <= ushiftl[t]*pload[t]*0.1)
+    @constraint(model, shiftq[t] <= ushiftq[t]*pload[t]*0.1)
 end
 
 @constraint(model, sum(shiftl) == sum(shiftq))  # Transfer Load Conservation
@@ -299,7 +299,7 @@ for t in 1:24               # Power Balance Constraints
 end
 
 for t in 1:24           # Calculate the Compensation Fee for Transferred Load
-    @constraint(model, cshift[t] == 50*shiftl[t] + 30*shiftq[t])
+    @constraint(model, cshift[t] == 60*shiftl[t] + 40*shiftq[t])
 end
 
 @variable(model, Cost_of_users)   # Cost of electricity users
@@ -322,20 +322,25 @@ pmgb= value.(pmgb)
 plot(Load_total)
 plot!(pmgb)
 
+sum(pmgb)
+sum(Load_total)
+
+plot(xs')
 
 
-yˢᴳ²_1_opt= value.(yˢᴳ²_1)
-yˢᴳ²_2_opt= value.(yˢᴳ²_2)
-yˢᴳ³_1_opt= value.(yˢᴳ³_1)
-yˢᴳ³_2_opt= value.(yˢᴳ³_2)
-yˢᴳ⁴_1_opt= value.(yˢᴳ⁴_1)
-yˢᴳ⁴_2_opt= value.(yˢᴳ⁴_2)
-yˢᴳ⁵_1_opt= value.(yˢᴳ⁵_1)
-yˢᴳ⁵_2_opt= value.(yˢᴳ⁵_2)
-yˢᴳ²⁷_1_opt= value.(yˢᴳ²⁷_1)
-yˢᴳ²⁷_2_opt= value.(yˢᴳ²⁷_2)
-yˢᴳ³⁰_1_opt= value.(yˢᴳ³⁰_1)
-yˢᴳ³⁰_2_opt= value.(yˢᴳ³⁰_2)
+
+yˢᴳ²_1= value.(yˢᴳ²_1)
+yˢᴳ²_2= value.(yˢᴳ²_2)
+yˢᴳ³_1= value.(yˢᴳ³_1)
+yˢᴳ³_2= value.(yˢᴳ³_2)
+yˢᴳ⁴_1= value.(yˢᴳ⁴_1)
+yˢᴳ⁴_2= value.(yˢᴳ⁴_2)
+yˢᴳ⁵_1= value.(yˢᴳ⁵_1)
+yˢᴳ⁵_2= value.(yˢᴳ⁵_2)
+yˢᴳ²⁷_1= value.(yˢᴳ²⁷_1)
+yˢᴳ²⁷_2= value.(yˢᴳ²⁷_2)
+yˢᴳ³⁰_1= value.(yˢᴳ³⁰_1)
+yˢᴳ³⁰_2= value.(yˢᴳ³⁰_2)
 
 
 I_min=zeros(1,30)
@@ -390,4 +395,5 @@ end
 I_min[k]=minimum(I_scc[k,:])
 end
 
+bar(I_min')
 bar(I_min')
