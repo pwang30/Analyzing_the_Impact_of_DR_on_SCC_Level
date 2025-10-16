@@ -49,12 +49,11 @@ P_g₀=[5.268 4.608 3.025 2.668 2.602 0]*10^3/5                       #  Initial
 yˢᴳ₀=[1 1 1 1 1 0] 
 
 
-#-----------------------------------Define Primal-Dual Model-----------------------------------
+
+#-----------------------------------Define Model-----------------------------------
 model= Model()
 
-#-------Define Primal Variales
-
-@variable(model, Pˢᴳ²_1[1:T])        # generation of SGs , buses:2,3,4,5,27,30.  
+@variable(model, Pˢᴳ²_1[1:T])        
 @variable(model, Pˢᴳ²_2[1:T])  
 @variable(model, Pˢᴳ³_1[1:T])     
 @variable(model, Pˢᴳ³_2[1:T])                
@@ -67,11 +66,11 @@ model= Model()
 @variable(model, Pˢᴳ³⁰_1[1:T])                
 @variable(model, Pˢᴳ³⁰_2[1:T])  
 
-@variable(model, Pᴵᴮᴳ¹[1:T]>=0)         # generation of IBRs (WT) , buses:1, 23, 26 , dual variables: ζᵐⁱⁿₜ  
+@variable(model, Pᴵᴮᴳ¹[1:T]>=0)         
 @variable(model, Pᴵᴮᴳ²³[1:T]>=0)              
 @variable(model, Pᴵᴮᴳ²⁶[1:T]>=0)  
 
-@variable(model, yˢᴳ²_1[1:T], Bin)      # status of SGs, buses:2,3,4,5,27,30.  Include strategic and non-strategic players
+@variable(model, yˢᴳ²_1[1:T], Bin)     
 @variable(model, yˢᴳ²_2[1:T], Bin)          
 @variable(model, yˢᴳ³_1[1:T], Bin)  
 @variable(model, yˢᴳ³_2[1:T], Bin)          
@@ -84,61 +83,8 @@ model= Model()
 @variable(model, yˢᴳ³⁰_1[1:T], Bin)   
 @variable(model, yˢᴳ³⁰_2[1:T], Bin)                       
 
-@variable(model, I_scc[1:30, 1:T])  
-for k in 1:30
-for t in 1:T  
-    @constraint(model,                                           # bounds for the SCL of buses  I_₂₆   
-   I_scc[k,t] == K_g[1,k]*yˢᴳ²_1[t]+ K_g[2,k]*yˢᴳ²_2[t]+ 
-    K_g[3,k]*yˢᴳ³_1[t]+ K_g[4,k]*yˢᴳ³_2[t]+ 
-    K_g[5,k]*yˢᴳ⁴_1[t]+ K_g[6,k]*yˢᴳ⁴_2[t]+
-    K_g[7,k]*yˢᴳ⁵_1[t]+ K_g[8,k]*yˢᴳ⁵_2[t]+
-    K_g[9,k]*yˢᴳ²⁷_1[t]+ K_g[10,k]*yˢᴳ²⁷_2[t]+ 
-    K_g[11,k]*yˢᴳ³⁰_1[t]+ K_g[12,k]*yˢᴳ³⁰_2[t]+
 
-    K_c[1,k]+ K_c[2,k]+ K_c[3,k]+
-    
-    K_m[1,k]*yˢᴳ²_1[t]*yˢᴳ²_2[t]+ K_m[2,k]*yˢᴳ²_1[t]*yˢᴳ³_1[t]+ K_m[3,k]*yˢᴳ²_1[t]*yˢᴳ³_2[t]+ K_m[4,k]*yˢᴳ²_1[t]*yˢᴳ⁴_1[t]+
-    K_m[5,k]*yˢᴳ²_1[t]*yˢᴳ⁴_2[t]+ K_m[6,k]*yˢᴳ²_1[t]*yˢᴳ⁵_1[t]+ K_m[7,k]*yˢᴳ²_1[t]*yˢᴳ⁵_2[t]+ K_m[8,k]*yˢᴳ²_1[t]*yˢᴳ²⁷_1[t]+
-    K_m[9,k]*yˢᴳ²_1[t]*yˢᴳ²⁷_2[t]+ K_m[10,k]*yˢᴳ²_1[t]*yˢᴳ³⁰_1[t]+ K_m[11,k]*yˢᴳ²_1[t]*yˢᴳ³⁰_2[t]+
-
-    K_m[12,k]*yˢᴳ²_2[t]*yˢᴳ³_1[t]+ K_m[13,k]*yˢᴳ²_2[t]*yˢᴳ³_2[t]+ K_m[14,k]*yˢᴳ²_2[t]*yˢᴳ⁴_1[t]+
-    K_m[15,k]*yˢᴳ²_2[t]*yˢᴳ⁴_2[t]+ K_m[16,k]*yˢᴳ²_2[t]*yˢᴳ⁵_1[t]+ K_m[17,k]*yˢᴳ²_2[t]*yˢᴳ⁵_2[t]+ K_m[18,k]*yˢᴳ²_2[t]*yˢᴳ²⁷_1[t]+
-    K_m[19,k]*yˢᴳ²_2[t]*yˢᴳ²⁷_2[t]+ K_m[20,k]*yˢᴳ²_2[t]*yˢᴳ³⁰_1[t]+ K_m[21,k]*yˢᴳ²_2[t]*yˢᴳ³⁰_2[t]+
-
-    K_m[22,k]*yˢᴳ³_1[t]*yˢᴳ³_2[t]+ K_m[23,k]*yˢᴳ³_1[t]*yˢᴳ⁴_1[t]+
-    K_m[24,k]*yˢᴳ³_1[t]*yˢᴳ⁴_2[t]+ K_m[25,k]*yˢᴳ³_1[t]*yˢᴳ⁵_1[t]+ K_m[26,k]*yˢᴳ³_1[t]*yˢᴳ⁵_2[t]+ K_m[27,k]*yˢᴳ³_1[t]*yˢᴳ²⁷_1[t]+
-    K_m[28,k]*yˢᴳ³_1[t]*yˢᴳ²⁷_2[t]+ K_m[29,k]*yˢᴳ³_1[t]*yˢᴳ³⁰_1[t]+ K_m[30,k]*yˢᴳ³_1[t]*yˢᴳ³⁰_2[t]+
-
-    K_m[31,k]*yˢᴳ³_2[t]*yˢᴳ⁴_1[t]+
-    K_m[32,k]*yˢᴳ³_2[t]*yˢᴳ⁴_2[t]+ K_m[33,k]*yˢᴳ³_2[t]*yˢᴳ⁵_1[t]+ K_m[34,k]*yˢᴳ³_2[t]*yˢᴳ⁵_2[t]+ K_m[35,k]*yˢᴳ³_2[t]*yˢᴳ²⁷_1[t]+
-    K_m[36,k]*yˢᴳ³_2[t]*yˢᴳ²⁷_2[t]+ K_m[37,k]*yˢᴳ³_2[t]*yˢᴳ³⁰_1[t]+ K_m[38,k]*yˢᴳ³_2[t]*yˢᴳ³⁰_2[t]+
-
-    K_m[39,k]*yˢᴳ⁴_1[t]*yˢᴳ⁴_2[t]+ K_m[40,k]*yˢᴳ⁴_1[t]*yˢᴳ⁵_1[t]+ K_m[41,k]*yˢᴳ⁴_1[t]*yˢᴳ⁵_2[t]+ K_m[42,k]*yˢᴳ⁴_1[t]*yˢᴳ²⁷_1[t]+
-    K_m[43,k]*yˢᴳ⁴_1[t]*yˢᴳ²⁷_2[t]+ K_m[44,k]*yˢᴳ⁴_1[t]*yˢᴳ³⁰_1[t]+ K_m[45,k]*yˢᴳ⁴_1[t]*yˢᴳ³⁰_2[t]+
-
-    K_m[46,k]*yˢᴳ⁴_2[t]*yˢᴳ⁵_1[t]+ K_m[47,k]*yˢᴳ⁴_2[t]*yˢᴳ⁵_2[t]+ K_m[48,k]*yˢᴳ⁴_2[t]*yˢᴳ²⁷_1[t]+
-    K_m[49,k]*yˢᴳ⁴_2[t]*yˢᴳ²⁷_2[t]+ K_m[50,k]*yˢᴳ⁴_2[t]*yˢᴳ³⁰_1[t]+ K_m[51,k]*yˢᴳ⁴_2[t]*yˢᴳ³⁰_2[t]+
-
-    K_m[52,k]*yˢᴳ⁵_1[t]*yˢᴳ⁵_2[t]+ K_m[53,k]*yˢᴳ⁵_1[t]*yˢᴳ²⁷_1[t]+
-    K_m[54,k]*yˢᴳ⁵_1[t]*yˢᴳ²⁷_2[t]+ K_m[55,k]*yˢᴳ⁵_1[t]*yˢᴳ³⁰_1[t]+ K_m[56,k]*yˢᴳ⁵_1[t]*yˢᴳ³⁰_2[t]+
-
-    K_m[57,k]*yˢᴳ⁵_2[t]*yˢᴳ²⁷_1[t]+
-    K_m[58,k]*yˢᴳ⁵_2[t]*yˢᴳ²⁷_2[t]+ K_m[59,k]*yˢᴳ⁵_2[t]*yˢᴳ³⁰_1[t]+ K_m[60,k]*yˢᴳ⁵_2[t]*yˢᴳ³⁰_2[t]+
-
-    K_m[61,k]*yˢᴳ²⁷_1[t]*yˢᴳ²⁷_2[t]+ K_m[62,k]*yˢᴳ²⁷_1[t]*yˢᴳ³⁰_1[t]+ K_m[63,k]*yˢᴳ²⁷_1[t]*yˢᴳ³⁰_2[t]+
-
-    K_m[64,k]*yˢᴳ²⁷_2[t]*yˢᴳ³⁰_1[t]+ K_m[65,k]*yˢᴳ²⁷_2[t]*yˢᴳ³⁰_2[t]+
-
-    K_m[66,k]*yˢᴳ³⁰_1[t]*yˢᴳ³⁰_2[t] )
-
-    @constraint(model,  I_scc[k,t] >= Iₗᵢₘ )
-
-end
-end
-
-
-
-@variable(model, Cᵁ²_1[1:T]>=0)                 # startup costs and shutdown costs for SGs , dual variables: ρˢᵗₜ , ρˢʰₜ
+@variable(model, Cᵁ²_1[1:T]>=0)               
 @variable(model, Cᵁ²_2[1:T]>=0)                 
 @variable(model, Cᴰ²_1[1:T]>=0)                 
 @variable(model, Cᴰ²_2[1:T]>=0)                 
@@ -162,8 +108,6 @@ end
 @variable(model, Cᵁ³⁰_2[1:T]>=0)            
 @variable(model, Cᴰ³⁰_1[1:T]>=0)    
 @variable(model, Cᴰ³⁰_2[1:T]>=0)            
-
-#-------Define Primal Constraints
 
 @constraint(model, Pˢᴳ²_1.<=yˢᴳ²_1*Pˢᴳₘₐₓ[1])           # bounds for the output of SGs with UC , dual variables: μᵐⁱⁿₜ , μᵐᵃˣₜ
 @constraint(model, yˢᴳ²_1*Pˢᴳₘᵢₙ[1].<=Pˢᴳ²_1)
@@ -190,8 +134,7 @@ end
 @constraint(model, Pˢᴳ³⁰_2.<=yˢᴳ³⁰_2*Pˢᴳₘₐₓ[6])       
 @constraint(model, yˢᴳ³⁰_2*Pˢᴳₘᵢₙ[6].<=Pˢᴳ³⁰_2)
 
-
-@constraint(model, Cᵁ²_1[1]>=(yˢᴳ²_1[1]-yˢᴳ₀[1])*Kˢᵗ[1])        # startup costs and shutdown costs for SGs , dual variables: σˢᵗₜ , σˢʰₜ
+@constraint(model, Cᵁ²_1[1]>=(yˢᴳ²_1[1]-yˢᴳ₀[1])*Kˢᵗ[1])        
 @constraint(model, Cᴰ²_1[1]>=(yˢᴳ₀[1]-yˢᴳ²_1[1])*Kˢʰ[1])  
 @constraint(model, Cᵁ²_2[1]>=(yˢᴳ²_2[1]-yˢᴳ₀[1])*Kˢᵗ[1])        
 @constraint(model, Cᴰ²_2[1]>=(yˢᴳ₀[1]-yˢᴳ²_2[1])*Kˢʰ[1]) 
@@ -248,58 +191,109 @@ for t in 2:T
 end
     
 for t in 1:T
-    @constraint(model, Pᴵᴮᴳ¹[t] <= IBG₁[t])        # wind power limit  , dual variable: ζᵐᵃˣₜ
+    @constraint(model, Pᴵᴮᴳ¹[t] <= IBG₁[t])        
     @constraint(model, Pᴵᴮᴳ²³[t]<= IBG₂₃[t])       
     @constraint(model, Pᴵᴮᴳ²⁶[t]<= IBG₂₆[t])                  
 end
 
 
+@variable(model, I_scc[1:30, 1:T])  
+for k in 1:30
+for t in 1:T  
+    @constraint(model,                                          
+   I_scc[k,t] == K_g[1,k]*yˢᴳ²_1[t]+ K_g[2,k]*yˢᴳ²_2[t]+ 
+    K_g[3,k]*yˢᴳ³_1[t]+ K_g[4,k]*yˢᴳ³_2[t]+ 
+    K_g[5,k]*yˢᴳ⁴_1[t]+ K_g[6,k]*yˢᴳ⁴_2[t]+
+    K_g[7,k]*yˢᴳ⁵_1[t]+ K_g[8,k]*yˢᴳ⁵_2[t]+
+    K_g[9,k]*yˢᴳ²⁷_1[t]+ K_g[10,k]*yˢᴳ²⁷_2[t]+ 
+    K_g[11,k]*yˢᴳ³⁰_1[t]+ K_g[12,k]*yˢᴳ³⁰_2[t]+
+
+    K_c[1,k]+ K_c[2,k]+ K_c[3,k]+
+    
+    K_m[1,k]*yˢᴳ²_1[t]*yˢᴳ²_2[t]+ K_m[2,k]*yˢᴳ²_1[t]*yˢᴳ³_1[t]+ K_m[3,k]*yˢᴳ²_1[t]*yˢᴳ³_2[t]+ K_m[4,k]*yˢᴳ²_1[t]*yˢᴳ⁴_1[t]+
+    K_m[5,k]*yˢᴳ²_1[t]*yˢᴳ⁴_2[t]+ K_m[6,k]*yˢᴳ²_1[t]*yˢᴳ⁵_1[t]+ K_m[7,k]*yˢᴳ²_1[t]*yˢᴳ⁵_2[t]+ K_m[8,k]*yˢᴳ²_1[t]*yˢᴳ²⁷_1[t]+
+    K_m[9,k]*yˢᴳ²_1[t]*yˢᴳ²⁷_2[t]+ K_m[10,k]*yˢᴳ²_1[t]*yˢᴳ³⁰_1[t]+ K_m[11,k]*yˢᴳ²_1[t]*yˢᴳ³⁰_2[t]+
+
+    K_m[12,k]*yˢᴳ²_2[t]*yˢᴳ³_1[t]+ K_m[13,k]*yˢᴳ²_2[t]*yˢᴳ³_2[t]+ K_m[14,k]*yˢᴳ²_2[t]*yˢᴳ⁴_1[t]+
+    K_m[15,k]*yˢᴳ²_2[t]*yˢᴳ⁴_2[t]+ K_m[16,k]*yˢᴳ²_2[t]*yˢᴳ⁵_1[t]+ K_m[17,k]*yˢᴳ²_2[t]*yˢᴳ⁵_2[t]+ K_m[18,k]*yˢᴳ²_2[t]*yˢᴳ²⁷_1[t]+
+    K_m[19,k]*yˢᴳ²_2[t]*yˢᴳ²⁷_2[t]+ K_m[20,k]*yˢᴳ²_2[t]*yˢᴳ³⁰_1[t]+ K_m[21,k]*yˢᴳ²_2[t]*yˢᴳ³⁰_2[t]+
+
+    K_m[22,k]*yˢᴳ³_1[t]*yˢᴳ³_2[t]+ K_m[23,k]*yˢᴳ³_1[t]*yˢᴳ⁴_1[t]+
+    K_m[24,k]*yˢᴳ³_1[t]*yˢᴳ⁴_2[t]+ K_m[25,k]*yˢᴳ³_1[t]*yˢᴳ⁵_1[t]+ K_m[26,k]*yˢᴳ³_1[t]*yˢᴳ⁵_2[t]+ K_m[27,k]*yˢᴳ³_1[t]*yˢᴳ²⁷_1[t]+
+    K_m[28,k]*yˢᴳ³_1[t]*yˢᴳ²⁷_2[t]+ K_m[29,k]*yˢᴳ³_1[t]*yˢᴳ³⁰_1[t]+ K_m[30,k]*yˢᴳ³_1[t]*yˢᴳ³⁰_2[t]+
+
+    K_m[31,k]*yˢᴳ³_2[t]*yˢᴳ⁴_1[t]+
+    K_m[32,k]*yˢᴳ³_2[t]*yˢᴳ⁴_2[t]+ K_m[33,k]*yˢᴳ³_2[t]*yˢᴳ⁵_1[t]+ K_m[34,k]*yˢᴳ³_2[t]*yˢᴳ⁵_2[t]+ K_m[35,k]*yˢᴳ³_2[t]*yˢᴳ²⁷_1[t]+
+    K_m[36,k]*yˢᴳ³_2[t]*yˢᴳ²⁷_2[t]+ K_m[37,k]*yˢᴳ³_2[t]*yˢᴳ³⁰_1[t]+ K_m[38,k]*yˢᴳ³_2[t]*yˢᴳ³⁰_2[t]+
+
+    K_m[39,k]*yˢᴳ⁴_1[t]*yˢᴳ⁴_2[t]+ K_m[40,k]*yˢᴳ⁴_1[t]*yˢᴳ⁵_1[t]+ K_m[41,k]*yˢᴳ⁴_1[t]*yˢᴳ⁵_2[t]+ K_m[42,k]*yˢᴳ⁴_1[t]*yˢᴳ²⁷_1[t]+
+    K_m[43,k]*yˢᴳ⁴_1[t]*yˢᴳ²⁷_2[t]+ K_m[44,k]*yˢᴳ⁴_1[t]*yˢᴳ³⁰_1[t]+ K_m[45,k]*yˢᴳ⁴_1[t]*yˢᴳ³⁰_2[t]+
+
+    K_m[46,k]*yˢᴳ⁴_2[t]*yˢᴳ⁵_1[t]+ K_m[47,k]*yˢᴳ⁴_2[t]*yˢᴳ⁵_2[t]+ K_m[48,k]*yˢᴳ⁴_2[t]*yˢᴳ²⁷_1[t]+
+    K_m[49,k]*yˢᴳ⁴_2[t]*yˢᴳ²⁷_2[t]+ K_m[50,k]*yˢᴳ⁴_2[t]*yˢᴳ³⁰_1[t]+ K_m[51,k]*yˢᴳ⁴_2[t]*yˢᴳ³⁰_2[t]+
+
+    K_m[52,k]*yˢᴳ⁵_1[t]*yˢᴳ⁵_2[t]+ K_m[53,k]*yˢᴳ⁵_1[t]*yˢᴳ²⁷_1[t]+
+    K_m[54,k]*yˢᴳ⁵_1[t]*yˢᴳ²⁷_2[t]+ K_m[55,k]*yˢᴳ⁵_1[t]*yˢᴳ³⁰_1[t]+ K_m[56,k]*yˢᴳ⁵_1[t]*yˢᴳ³⁰_2[t]+
+
+    K_m[57,k]*yˢᴳ⁵_2[t]*yˢᴳ²⁷_1[t]+
+    K_m[58,k]*yˢᴳ⁵_2[t]*yˢᴳ²⁷_2[t]+ K_m[59,k]*yˢᴳ⁵_2[t]*yˢᴳ³⁰_1[t]+ K_m[60,k]*yˢᴳ⁵_2[t]*yˢᴳ³⁰_2[t]+
+
+    K_m[61,k]*yˢᴳ²⁷_1[t]*yˢᴳ²⁷_2[t]+ K_m[62,k]*yˢᴳ²⁷_1[t]*yˢᴳ³⁰_1[t]+ K_m[63,k]*yˢᴳ²⁷_1[t]*yˢᴳ³⁰_2[t]+
+
+    K_m[64,k]*yˢᴳ²⁷_2[t]*yˢᴳ³⁰_1[t]+ K_m[65,k]*yˢᴳ²⁷_2[t]*yˢᴳ³⁰_2[t]+
+
+    K_m[66,k]*yˢᴳ³⁰_1[t]*yˢᴳ³⁰_2[t] )
+
+    @constraint(model,  I_scc[k,t] >= Iₗᵢₘ )
+
+end
+end
 
 
 #--------DR modelling
-#xs = 1.05 .* [100,100,100,100,100,100,380,380,380,800,800,800,800,800,380,380,380,800,800,800,380,380,100,100]   # energy price, obtained from restricted method (€/MWh)
 
 xs = energy_price_restricted
 
-kil = [200, 300, 500]        # Interrupted Load Compensation Fee
-cil = [0.05, 0.03, 0.01]      # Maximum Interrupted Load Ratio
+kil = [50, 70, 100]         # Interrupted Load Compensation Fee
+cil = [0.1, 0.08, 0.05]      # Maximum Interrupted Load Ratio
+sil=[30, 20]  
 
-@variable(model, 0 <= pil[1:3, 1:24])  # Interrupted Load
-@variable(model, 0 <= shiftl[1:24])    # Transferred-out Load
-@variable(model, 0 <= shiftq[1:24])    # Transferred-in Load
-@variable(model, ushiftl[1:24], Bin)   
-@variable(model, ushiftq[1:24], Bin)
-@variable(model, pmgb[1:24])           # The User's Final Electricity Consumption
-@variable(model, cshift[1:24])         # Transferred Load Compensation Fee
+@variable(model, 0 <= pil[1:3, 1:T])  # Interrupted Load
+@variable(model, 0 <= shiftl[1:T])    # Transferred-out Load
+@variable(model, 0 <= shiftq[1:T])    # Transferred-in Load
+@variable(model, ushiftl[1:T], Bin)   
+@variable(model, ushiftq[1:T], Bin)
+@variable(model, pmgb[1:T])           # The User's Final Electricity Consumption
+@variable(model, cshift[1:T])         # Transferred Load Compensation Fee
 
 for t in 1:T
     @constraint(model, Pˢᴳ²_1[t]+Pˢᴳ²_2[t]+Pˢᴳ³_1[t]+Pˢᴳ³_2[t]+Pˢᴳ⁴_1[t]+Pˢᴳ⁴_2[t]+Pˢᴳ⁵_1[t]+Pˢᴳ⁵_2[t]+Pˢᴳ²⁷_1[t]+Pˢᴳ²⁷_2[t]+Pˢᴳ³⁰_1[t]+Pˢᴳ³⁰_2[t]+
-                   Pᴵᴮᴳ¹[t]+Pᴵᴮᴳ²³[t]+Pᴵᴮᴳ²⁶[t]==pmgb[t])     # power balance , dual variable: λᴱₜ
+                   Pᴵᴮᴳ¹[t]+Pᴵᴮᴳ²³[t]+Pᴵᴮᴳ²⁶[t] == pmgb[t])     # power balance 
 end
 
 pload=Load_total   # (MW)
-for m in 1:3, t in 1:24   # Hierarchical Interrupted Load Constraints
+for m in 1:3, t in 1:T   # Hierarchical Interrupted Load Constraints
     @constraint(model, pil[m,t] <= cil[m]*pload[t])
 end
 
-for m in 1:3, t in 2:24   # Continuous Interrupted Load Constraints
-    @constraint(model, pil[m,t] + pil[m,t-1] <= 0.09*pload[t])
+for m in 1:3, t in 2:T   # Continuous Interrupted Load Constraints
+    @constraint(model, pil[m,t] + pil[m,t-1] <= 0.2*pload[t])
 end
 
-for t in 1:24               # Transferable Load Constraints
+for t in 1:T               # Transferable Load Constraints
     @constraint(model, ushiftl[t] + ushiftq[t] <= 1)
-    @constraint(model, shiftl[t] <= ushiftl[t]*pload[t]*0.1)
-    @constraint(model, shiftq[t] <= ushiftq[t]*pload[t]*0.1)
+    @constraint(model, shiftl[t] <= ushiftl[t]*pload[t]*0.12)
+    @constraint(model, shiftq[t] <= ushiftq[t]*pload[t]*0.12)
 end
 
 @constraint(model, sum(shiftl) == sum(shiftq))  # Transfer Load Conservation
 
-for t in 1:24               # Power Balance Constraints
+for t in 1:T               # Power Balance Constraints
     @constraint(model, pload[t] - shiftl[t] + shiftq[t] - sum(pil[:,t]) == pmgb[t])
 end
 
-for t in 1:24           # Calculate the Compensation Fee for Transferred Load
-    @constraint(model, cshift[t] == 60*shiftl[t] + 40*shiftq[t])
+for t in 1:T           # Calculate the Compensation Fee for Transferred Load
+    @constraint(model, cshift[t] == sil[1]*shiftl[t] + sil[2]*shiftq[t])
 end
 
 @variable(model, Cost_of_users)   # Cost of electricity users
@@ -318,16 +312,15 @@ obj_Primal=cost_onoff_Primal +cost_nl_Primal +cost_gene_Primal
 set_optimizer(model , Gurobi.Optimizer)
 optimize!(model)
 
-pmgb= value.(pmgb)
-plot(Load_total)
-plot!(pmgb)
 
-sum(pmgb)
-sum(Load_total)
+obj_Primal_value= value.(obj_Primal)
+Cost_of_users_value= value.(Cost_of_users)
+obj_Primal_value+Cost_of_users_value
 
-plot(xs')
+matwrite("energy_price.mat", Dict("energy_price" => energy_price_restricted))
 
 
+Cost_of_users_value= value.(Cost_of_users)
 
 yˢᴳ²_1= value.(yˢᴳ²_1)
 yˢᴳ²_2= value.(yˢᴳ²_2)
@@ -395,5 +388,6 @@ end
 I_min[k]=minimum(I_scc[k,:])
 end
 
-bar(I_min')
-bar(I_min')
+
+matwrite("I_min_no_DR.mat", Dict("I_min_no_DR" => I_min))
+
