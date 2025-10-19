@@ -1,8 +1,7 @@
 # Author: Peng Wang       from Technical University of Madrid (UPM)
 # Supervisor: Luis Badesa
 
-# Pricing SCL by primal-dual formulation
-# 29.May.2025
+# 19.Oct.2025
 
 import Pkg
 using JuMP,Gurobi, CSV,DataFrames,LinearAlgebra, XLSX, IterTools, DelimitedFiles,Plots,MAT
@@ -312,6 +311,7 @@ obj_Primal=cost_onoff_Primal +cost_nl_Primal +cost_gene_Primal
 set_optimizer(model , Gurobi.Optimizer)
 optimize!(model)
 
+pil= value.(pil)
 
 obj_Primal_value= value.(obj_Primal)
 Cost_of_users_value= value.(Cost_of_users)
@@ -388,27 +388,8 @@ end
 I_min[k]=minimum(I_scc[k,:])
 end
 
-clc
-clear
 
-bar(I_min_no_DR)
-hold on
-bar(I_min_DR)
-hold on
-bar(5*ones(1,30))
-
-
-fig = openfig('Demand_DR.fig');   % 打开已有图形
-ax = gca;                        % 获取当前坐标轴句柄
-hold(ax, 'on');                  % 保持当前绘图
-
-yyaxis right                     % 激活右侧 y 轴
-plot([1:24], energy_price, 'r', 'LineWidth', 2)   % 在右轴绘制新数据（例如红线）
-ylabel('Energy price')              % 设置右侧轴标题         
-ylim([5 17])          % 设置右轴显示范围
-ax.YColor = 'k'; 
-
-exportgraphics(gcf, 'figure.pdf', 'ContentType', 'vector', 'BackgroundColor', 'none')
 matwrite("I_min_no_DR.mat", Dict("I_min_no_DR" => I_min))
+
 
 
