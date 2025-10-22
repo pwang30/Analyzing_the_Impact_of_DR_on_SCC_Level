@@ -23,6 +23,7 @@ I_SCC_all_buses_scenarios, matrix_ω =dataset_gene(I_IBG, β,v_n)               
 K_g, K_c, K_m, N_type_1, N_type_2, err_type_1, err_type_2= offline_trainning(I_SCC_all_buses_scenarios, matrix_ω, Iₗᵢₘ, v)  # offline_trainning
 
 
+energy_price_restricted=[8.72 8.72 8.72 8.72 8.72 7.1 8.72 10.47 10.47 11.49 11.49 11.49 11.49 11.49 11.49 11.49 15.02 15.02 11.49 11.49 10.47 8.72 8.72 8.72 ]
 
 
 #-----------------------------------Define Parameters for Optimization-----------------------------------  
@@ -390,6 +391,7 @@ end
 
 
 matwrite("I_min_no_DR.mat", Dict("I_min_no_DR" => I_min))
+
 
 
 
