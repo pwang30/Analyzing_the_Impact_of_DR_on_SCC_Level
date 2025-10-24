@@ -27,7 +27,7 @@ plot!(I_SCC_all_buses_scenarios[500:1500,1], seriestype=:scatter)
 
 matwrite("IBG_bus1_real.mat", Dict("IBG_bus1_real" => I_SCC_all_buses_scenarios[500:1500,1]))
 
-energy_price_restricted=[8.72 8.72 8.72 8.72 8.72 7.1 8.72 10.47 10.47 11.49 11.49 11.49 11.49 11.49 11.49 11.49 15.02 15.02 11.49 11.49 10.47 8.72 8.72 8.72 ]
+energy_price_restricted=[8.72 8.72 8.72 8.72 8.72 7.1 8.72 10.47 10.47 11.49 11.49 11.49 11.49 11.49 11.49 11.49 15.02 15.02 11.49 11.49 10.47 8.72 8.72 8.72 ]  # obtained via the restricted pricing
 
 
 #-----------------------------------Define Parameters for Optimization-----------------------------------  
@@ -395,6 +395,7 @@ end
 
 
 matwrite("I_min_no_DR.mat", Dict("I_min_no_DR" => I_min))
+
 
 
 
