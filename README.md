@@ -30,14 +30,15 @@ We try to guide you to understand our logistics of coding, once you fully unders
 
 If you find something helpful or use this code for your own work, please cite this paper:
 <ol>
-      Wang, Peng and Luis Badesa. "Pricing Short-Circuit Current via a Primal-Dual Formulation for Preserving Integrality Constraints." arXiv preprint arXiv:2510.05293 (2025).
+    Wang, Peng, Zhengmao Li, and Luis Badesa. "Analyzing the Impact of Demand Response on Short-Circuit Current via a Unit Commitment Model." arXiv preprint arXiv:2511.00296 (2025).
 </ol>
       <br>
       
 <ol> 
-@article{wang2025pricing, <br>
-  title={Pricing Short-Circuit Current via a Primal-Dual Formulation for Preserving Integrality Constraints}, <br>
-  author={Wang, Peng and Badesa, Luis}, <br>
-  journal={arXiv preprint arXiv:2510.05293}, <br>
+
+@article{wang2025analyzing,<br>
+  title={Analyzing the Impact of Demand Response on Short-Circuit Current via a Unit Commitment Model},<br>
+  author={Wang, Peng and Li, Zhengmao and Badesa, Luis},<br>
+  journal={arXiv preprint arXiv:2511.00296},<br>
   year={2025} <br>
 }
