@@ -5,7 +5,7 @@
   1. Chu, Zhongda, and Fei Teng. ["Short circuit current constrained UC in high IBG-penetrated power systems." IEEE Transactions on Power Systems 36.4 (2021): 3776-3785.](https://ieeexplore.ieee.org/abstract/document/9329077)
   2. Chu, Zhongda, Jingyi Wu, and Fei Teng. ["Pricing of short circuit current in high IBR-penetrated system." Electric Power Systems Research 235 (2024): 110690.](https://www.sciencedirect.com/science/article/pii/S0378779624005765)
 - Data used in this work and relevant work/data please refer to our previous work:
-  1. Wang, Peng, and Luis Badesa. ["Imperfect Competition in Markets for Short-Circuit Current Services." arXiv preprint arXiv:2508.09425 (2025)](https://arxiv.org/pdf/2508.09425).
+  1. Wang, Peng, and Luis Badesa. ["Imperfect Competition in Markets for Short-Circuit Current Services." Sustainable Energy, Grids and Networks (2026): 102423.](https://arxiv.org/pdf/2508.09425)
   2. Wang, Peng, and Luis Badesa. ["Pricing Short-Circuit Current via a Primal-Dual Formulation for Preserving Integrality Constraints." arXiv preprint arXiv:2510.05293 (2025)](https://arxiv.org/pdf/2510.05293).
      
 
